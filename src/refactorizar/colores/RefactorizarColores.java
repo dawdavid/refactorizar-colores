@@ -24,23 +24,42 @@ public class RefactorizarColores {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // (1) comprobar el sistema Operativo y asegurarnos qeu solo funciona en linux
-        boolean mrjVersionExists = System.getProperty("mrj.version") != null;
-        boolean osNameExists = System.getProperty("os.name").startsWith("linux");
+        testOperatingSystem();
+       DDLoggerInterface logger;
 
-        if ( !mrjVersionExists || !osNameExists)
-        {
-          System.err.println("Este programa no puede ejecutarse en sistemas operativo inferiores");
-          System.exit(1);
-        }
-        int DEFAULT_LOG_LEVEL = 0;
+        initializeLogFiles();
 
+        getReferences();
+        setDefaultColor();
+
+
+    }
+
+    private static void getReferences() {
+        // (3, 4) recupera los ajustes del programa y establece el color por defecto.
+        
+    }
+
+    private static void setDefaultColor() {
+        int r = preferences.getInt(CURTAIN_R, 0);
+        int g = preferences.getInt(CURTAIN_G, 0);
+        int b = preferences.getInt(CURTAIN_B, 0);
+        int a = preferences.getInt(CURTAIN_A, 255);
+        currentColor = new Color(r,g,b,a);
+    }
+
+    private static DDLoggerInterface initializeLogFiles() {
         // (2) inicializar ficheros de log
+        DDLoggerInterface logger;
+        
+        
+        int DEFAULT_LOG_LEVEL = 0;
+        
         int currentLoggingLevel = DEFAULT_LOG_LEVEL;
         String ERROR_LOG_FILENAME = "error";
         String WARNING_LOG_FILENAME = "warning";
         String DEBUG_LOG_FILENAME = "debug";
-        DDLoggerInterface logger;
+        
         String CANON_DEBUG_FILENAME = "current.log";
 
         File errorFile = new File(ERROR_LOG_FILENAME);
@@ -53,16 +72,19 @@ public class RefactorizarColores {
         if (debugFile.exists()) currentLoggingLevel = DDLoggerInterface.LOG_DEBUG;
 
         logger = new DDSimpleLogger(CANON_DEBUG_FILENAME, currentLoggingLevel, true, true);
+        return logger;
+    }
 
-        // (3, 4) recupera los ajustes del programa y establece el color por defecto.
-        preferences = Preferences.userNodeForPackage(this.getClass());
-        int r = preferences.getInt(CURTAIN_R, 0);
-        int g = preferences.getInt(CURTAIN_G, 0);
-        int b = preferences.getInt(CURTAIN_B, 0);
-        int a = preferences.getInt(CURTAIN_A, 255);
-        currentColor = new Color(r,g,b,a);
-
-
+    private static void testOperatingSystem() {
+        // (1) comprobar el sistema Operativo y asegurarnos qeu solo funciona en linux
+        boolean mrjVersionExists = System.getProperty("mrj.version") != null;
+        boolean osNameExists = System.getProperty("os.name").startsWith("linux");
+        
+        if ( !mrjVersionExists || !osNameExists)
+        {
+            System.err.println("Este programa no puede ejecutarse en sistemas operativo inferiores");
+            System.exit(1);
+        }
     }
     
 }
